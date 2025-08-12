@@ -367,7 +367,7 @@
 
   set text(font: "arial", size: 20pt)
   set bibliography(title: none, style: "nature-footnote.csl")
-  show footnote.entry: set text(size: 0.7em, fill: rgb("#888888"))
+  show footnote.entry: set text(size: 0.6em, fill: rgb("#888888"))
   set footnote.entry(separator: none, indent: 0em)
 
   let primary = rgb("#dc005a")
