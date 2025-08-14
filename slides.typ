@@ -101,6 +101,8 @@ cetz.canvas({
   image("figures/arpes_puppin.png", height: 45%),
 ))
 
+#blcite(<Torre2021>)#blcite(<Puppin2020>)
+
 #pause ... but how can we routinely compute them? #pause
 - GW: accurate, expensive, often ill-behaved, diagrammatic
 - DFT: plagued by systematic errors
@@ -195,10 +197,10 @@ $
     table.header([], [*DFT+_U_*], [*Koopmans*]),
     table.hline(),
    [seeks to correct...],
-   uncover("2-")[erroneous global curvature in total energies w.r.t. $N$],
-   uncover("4-")[erroneous global curvature in total energies w.r.t. $f_i forall i$],
-   [by construction...],
-   uncover("3-")[corrects local curvature in total energies (BLOR does so more faithfully)],
+   uncover("2-")[erroneous curvature in total energies w.r.t. $N$],
+   uncover("4-")[erroneous curvature in total energies w.r.t. $f_i forall i$],
+   [in practice...],
+   uncover("3-")[corrects curvature in total energies w.r.t. local populations (BLOR does so more faithfully)],
    uncover("5-")[removes dependence of $epsilon_i$ on $f_i$ and guarantees $epsilon_i = E_i (N plus.minus 1) - E(N)$],
    [correction applied to...],
    [],
@@ -383,6 +385,8 @@ The potential is orbital-density-dependent!
 - we know $hat(H)|phi_i angle.r$ but not $hat(H)$ #pause
 - we have a natural generalisation of DFT towards spectral functional theory@Ferretti2014
 
+#blcite(<Nguyen2018>)
+
 == To summarise...
 $
   E^"KI"_bold(alpha) [rho, {rho_i}] =
@@ -423,8 +427,8 @@ $
    [seeks to correct...],
    [erroneous global curvature in total energies w.r.t. $N$],
    [erroneous global curvature in total energies w.r.t. #uncover("6-")[*canonical*] orbital occupancies],
-   [by construction...],
-   [corrects local curvature in total energies (BLOR does so more faithfully)],
+   [in practice...],
+   [corrects curvature in total energies w.r.t. local populations (BLOR does so more faithfully)],
    [removes dependence of $epsilon_i$ on #uncover("7-")[*variational*] orbital occupations and guarantees $epsilon_i = E_i (N plus.minus 1) - E(N)$],
    [correction applied to...],
    uncover("2-")[selected subspaces (e.g. _3d_ orbitals)],
@@ -511,7 +515,7 @@ table.hline(),
 === Hooke's atom@Schubert2023
 
 #align(center + horizon, 
-  image("figures/schubert_vxc.jpeg", height: 85%)
+  image("figures/schubert_vxc_only.jpeg", height: 70%)
 )
 
 = Caveats
@@ -667,12 +671,50 @@ $
   + minimal input
   + fast
 
-  #pause
-  To this end... #pause
-  - symmetries #pause
-  - automated Wannierisation #pause
-  - `AiiDA` integration
 ]
+
+== Automated Wannierisation
+#slide()[
+  Koopmans functionals rely heavily on Wannier functions...
+  - to initialise the minmising orbitals, _or_
+  - in place of the minimising orbitals entirely
+
+#pause
+
+#grid(
+  columns: (2fr, 2fr, 3fr),
+  align: center + horizon,
+  gutter: 1em,
+  image("figures/proj_disentanglement_fig1a.png", height: 45%),
+  image("figures/new_projs.png", height: 45%),
+  image("figures/target_manifolds_fig1b.png", height: 45%),
+
+  text("projectability-based disentanglement") + cite(<Qiao2023>),
+  text("use PAOs found in pseudopotentials"),
+  text("parallel transport to separate manifolds") + cite(<Qiao2023a>),
+)
+]
+
+== 
+#blcite(<Huber2020>)
+#v(-2em)
+#align(center,
+  [
+  #grid(columns: 3, align: horizon, column-gutter: 0.5em,
+    image("media/logos/koopmans_grey_on_transparent.svg", height: 3em),
+    image("figures/handshake.png", height: 2em, alt: "handshake"),
+    image("media/logos/aiida.svg", height: 3em)
+  )
+  `$ koopmans run tio2.json` #pause $arrow.r$ `$ koopmans run --engine=aiida tio2.json`
+  ]
+)
+
+remote compute, parallel step execution, provenance-tracking, (requires configuration, WIP...)
+
+#pause
+#align(center, 
+  image("figures/aiida-speed-up.svg", width: 70%)
+)
 
 == 
 #slide()[
@@ -716,7 +758,7 @@ $
     Koopmans functionals...
     - impose generalised piecewise linearity condition to DFT
     - give band structures with comparable accuracy to state-of-the-art GW
-    - can be used in place of GW in BSE calculation of excitons, SOC, ...
+    - can be used in place of GW in BSE calculation of excitons, for systems with strong SOC, ...
     - are increasingly black-box
   ],
 )
@@ -831,27 +873,6 @@ Two options: #pause _1._ use a more advanced functional#pause, or _2._ stay in t
 ]
 
 
-== Automated Wannierisation
-#slide()[
-  Koopmans functionals rely heavily on Wannier functions...
-  - to initialise the minmising orbitals, _or_
-  - in place of the minimising orbitals entirely
-
-#pause
-
-#grid(
-  columns: (2fr, 2fr, 3fr),
-  align: center + horizon,
-  gutter: 1em,
-  image("figures/proj_disentanglement_fig1a.png", height: 45%),
-  image("figures/new_projs.png", height: 45%),
-  image("figures/target_manifolds_fig1b.png", height: 45%),
-
-  text("projectability-based disentanglement") + cite(<Qiao2023>),
-  text("use PAOs found in pseudopotentials"),
-  text("parallel transport to separate manifolds") + cite(<Qiao2023a>),
-)
-]
 == Machine-learned electronic screening
 
 #pagebreak()
@@ -994,26 +1015,6 @@ $bold(k) in "BZ"$ $arrow.r$ $bold(k) in "IBZ"(bold(q))$ (can only use symmetries
 
 #align(horizon + center, image("figures/bz-to-ibz-speedup.svg", height: 100%))
 
-== 
-#blcite(<Huber2020>)
-#v(-2em)
-#align(center,
-  [
-  #grid(columns: 3, align: horizon, column-gutter: 0.5em,
-    image("media/logos/koopmans_grey_on_transparent.svg", height: 3em),
-    image("figures/handshake.png", height: 2em, alt: "handshake"),
-    image("media/logos/aiida.svg", height: 3em)
-  )
-  `$ koopmans run tio2.json` #pause $arrow.r$ `$ koopmans run --engine=aiida tio2.json`
-  ]
-)
-
-remote compute, parallel step execution, provenance-tracking, (requires configuration, WIP...)
-
-#pause
-#align(center, 
-  image("figures/aiida-speed-up.svg", width: 70%)
-)
 
 == Connections with approx. self-energies
 
