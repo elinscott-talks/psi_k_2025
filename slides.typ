@@ -109,11 +109,14 @@ cetz.canvas({
 #box[#move(dy: 0.1em, image("figures/lightbulb.png", height: 1em))] Koopmans functionals: cure systematic errors in DFT $arrow.r$ a functional that can accurately predict single-particle excitations
 #v(-1em)
 
-= Basic theory of Koopmans functionals
+= The failures of DFT
 
 == Total energy differences vs. eigenvalues
 
-We all know that DFT underestimates the band gap. But why?
+#align(horizon,
+grid(align: horizon, columns: 2, column-gutter: 1em,
+  [
+We all know that DFT underestimates the band gap. But why? #pause
 
 The exact Green's function has poles that correspond to total energy differences
 
@@ -121,13 +124,19 @@ $
   ε_i = cases(E(N) - E_i (N-1) & "if" i in "occ", E_i (N+1) - E(N) & "if" i in "emp")
 $
 
-but DFT does #emph[not]
+#pause
 
-#focus-slide()[Core idea: impose this condition to DFT to improve its description of spectral properties]
+but DFT does #emph[not]
+],[
+  #image(width: 20em, "figures/fig_en_curve_gradients_zoom.svg")
+]
+))
+
+#focus-slide()[Core idea: impose this condition on DFT]
 
 == Imposing generalised piecewise linearity
 #align(horizon,
-grid(align: horizon, columns: 2, column-gutter: 1em,
+grid(align: horizon, columns: (1fr, auto), column-gutter: 1em,
   [Formally, every orbital $i$ should have an eigenenergy
   $
     epsilon_i^"Koopmans" = ⟨
@@ -138,7 +147,7 @@ grid(align: horizon, columns: 2, column-gutter: 1em,
   - independent of $f_i$
   - equal to $Delta E$ of explicit electron addition/removal
 ],[
-  #image(width: 100%, "figures/fig_en_curve_gradients_zoom.svg")
+  #image(width: 20em, "figures/fig_en_curve_gradients_zoom.svg")
 ]
 ))
 
@@ -147,7 +156,7 @@ grid(align: horizon, columns: 2, column-gutter: 1em,
   #let (uncover, only, alternatives, delayedmark, delayedmarkhl) = methods-with-marks(self)
 
 #align(horizon,
-grid(align: horizon, columns: 2, column-gutter: 1em,
+grid(align: horizon, columns: (1fr, auto), column-gutter: 1em,
 [
   $
   E^"KI" &[rho, {rho_i}] =
@@ -156,15 +165,15 @@ grid(align: horizon, columns: 2, column-gutter: 1em,
   sum_i (
     - delayedmarkhl(#2, integral_0^f_i lr(angle.l phi_i mid(|) hat(h)^"DFT" (f) mid(|) phi_i angle.r) dif f, tag: #<remove_nonlin>, color: primary)
   \ &
-    + delayedmarkhl(#3, f_i integral_0^1 lr(angle.l phi_i mid(|) hat(h)^"DFT" (f) mid(|) phi_i angle.r) dif f, tag: #<restore_linear>, color: secondary)
+    + delayedmarkhl(#3, f_i integral_0^1 lr(angle.l phi_i mid(|) hat(h)^"DFT" (f) mid(|) phi_i angle.r) dif f, tag: #<restore_linear>, color: primary)
   )
 $
-Bakes the total energy differences $E^"DFT" [rho^(f_i arrow.r 1)] - E^"DFT" [rho^(f_i arrow.r 0)]$ into the functional
-#only("2-")[#annot(<remove_nonlin>, pos: bottom)[#align(center, [removes non-linear dependence on $f_i$])]]
-#only("3-")[#annot(<restore_linear>, pos: bottom)[#align(center, [restores linear dependence on $f_i$])]]
+// Bakes the total energy differences $E^"DFT" [rho^(f_i arrow.r 1)] - E^"DFT" [rho^(f_i arrow.r 0)]$ into the functional
+#uncover("2-")[#annot(<remove_nonlin>, pos: bottom)[#align(center, [removes dependence on $f_i$])]]
+#uncover("3-")[#annot(<restore_linear>, pos: bottom)[#align(center, [restores linear dependence on $f_i$])]]
 
 ],[
-  #image(width: 100%, "figures/fig_en_curve_gradients_zoom.svg")
+  #image(width: 20em, "figures/fig_en_curve_gradients_zoom.svg")
 ]))
 
 ])
@@ -176,6 +185,7 @@ Bakes the total energy differences $E^"DFT" [rho^(f_i arrow.r 1)] - E^"DFT" [rho
     if calc.rem(y, 2) == 0 { silver } else { silver.lighten(75%) },
     inset: 0.5em,
 )
+#show table.cell.where(x: 0): set text(style: "italic")
 
 #show table.header: {
   set text(fill: primary, weight: "semibold")
@@ -184,7 +194,7 @@ Bakes the total energy differences $E^"DFT" [rho^(f_i arrow.r 1)] - E^"DFT" [rho
 #table(align: horizon, columns: (1fr, 2fr, 2fr), stroke: none,
     table.header([], [*DFT+_U_*], [*Koopmans*]),
     table.hline(),
-   [designed to correct...],
+   [seeks to correct...],
    uncover("2-")[erroneous global curvature in total energies w.r.t. $N$],
    uncover("4-")[erroneous global curvature in total energies w.r.t. $f_i forall i$],
    [by construction...],
@@ -202,50 +212,84 @@ Bakes the total energy differences $E^"DFT" [rho^(f_i arrow.r 1)] - E^"DFT" [rho
 )
 ]
 == Making the functional tractable
+#slide(repeat: 4, self => [
 
-$E[rho^(f_i arrow.r f)]$ cannot be directly evaluated
-// 
-// Instead use a frozen-orbital picture:
-// 
-// $
-//  rho^(f_i arrow.r f)(bold(r)) approx rho(bold(r)) + (f - f_i) |phi^N_i (bold(r))|^2
-// $
-// 
-// very easy to evaluate -- but not at all accurate! Correct this _post hoc_ via a screening parameter i.e.
-// 
-// $
-//   E[rho^(f_i arrow.r f)] approx alpha_i E[rho + (f - f_i) |phi^N_i (bold(r))|^2]
-// $
-#align(center + horizon, 
-grid(align: center + horizon, columns: 3, column-gutter: 2cm, row-gutter: 1cm,
-cetz.canvas({
-  import cetz.draw: *
-  content((1.25, 1.5), [$rho$])
-  circle((0, 0), radius: 1, fill: primary, stroke: none)
-  circle((2.5, 0), radius: 1, fill: primary, stroke: none)
+  #let (uncover, only, alternatives, delayedmark, delayedmarkhl) = methods-with-marks(self)
+  $
+    E^"KI" [{rho_i}] = &
+    E^"DFT" [rho]
+    +
+    sum_i (
+      - integral_0^f_i lr(angle.l phi_i mid(|) hat(h)^"DFT" (f) mid(|) phi_i angle.r) dif f
+      + f_i integral_0^1 lr(angle.l phi_i mid(|) hat(h)^"DFT" (f) mid(|) phi_i angle.r) dif f
+    )
+    #pause
+    \ = & E^"DFT" [rho]
+    + sum_i {
+      - (E^"DFT" [rho] - delayedmark(#3, E^"DFT" [rho^(f_i arrow.r 0)], tag: #<ENm1_hard>, color: primary))
+      + f_i (delayedmark(#3, E^"DFT" [rho^(f_i arrow.r 1)], tag: #<ENp1_hard>, color: primary) - delayedmark(#3, E^"DFT" [rho^(f_i arrow.r 0)], tag: #<ENm1b_hard>, color: primary))
+    }
+    // uncover("5-", 
+    // \ arrow.r E^"uKI" [{rho_i}] approx & 
+    // E^"DFT" [rho]
+    // \ & +
+    // sum_i {
+    //   - (E^"DFT" [rho] - delayedmark(#3, E^"DFT" [rho - rho_i], tag: #<ENm1>, color: primary))
+    //   + f_i (delayedmark(#3, E^"DFT" [rho - rho_i + n_i], tag: #<ENp1>, color: primary) - delayedmark(#3, E^"DFT" [rho - rho_i], tag: #<ENm1b>, color: primary))
+    // }
+    // )
+  $
 
-}),
-cetz.canvas({
-  import cetz.draw: *
+  #pause
+  #annot(<ENm1_hard>, pos: bottom)[#align(center, [cannot evaluate \ directly])]
+  #annot(<ENp1_hard>, pos: bottom)[#align(center, [cannot evaluate \ directly])]
+  #annot(<ENm1b_hard>, pos: bottom)[#align(center, [cannot evaluate \ directly])]
+  #pause
 
-  content((9, 1.5), [$rho^(f_1 arrow.r 0)$])
-  arc((10.75, 0), start: 0deg, stop: 360deg, radius: (1.5, 1), fill: primary, stroke: none)
-  circle((8, 0), radius: 1, fill: none, stroke: (thickness: 2pt, paint: primary))
-  circle((8, 0), radius: 1, fill: none, stroke: (dash: "dashed", thickness: 2pt, paint: white))
-  // content((8, -1.5), [$f_1 = 0$])
-}),
-cetz.canvas({
-  import cetz.draw: *
+  // 
+  // Instead use a frozen-orbital picture:
+  // 
+  // $
+  //  rho^(f_i arrow.r f)(bold(r)) approx rho(bold(r)) + (f - f_i) |phi^N_i (bold(r))|^2
+  // $
+  // 
+  // very easy to evaluate -- but not at all accurate! Correct this _post hoc_ via a screening parameter i.e.
+  // 
+  // $
+  //   E[rho^(f_i arrow.r f)] approx alpha_i E[rho + (f - f_i) |phi^N_i (bold(r))|^2]
+  // $
+  #v(-5em)
+  #align(center + horizon, 
+  grid(align: center + horizon, columns: 3, column-gutter: 2cm, row-gutter: 1cm,
+  cetz.canvas({
+    import cetz.draw: *
+    content((1.25, 1.5), [$rho$])
+    circle((0, 0), radius: 1, fill: primary, stroke: none)
+    circle((2.5, 0), radius: 1, fill: primary, stroke: none)
 
-  content((17.25, 1.5), [$rho - |psi^N_1(r)|^2$])
-  circle((16, 0), radius: 1, fill: none, stroke: (dash: "dashed", thickness: 2pt, paint: primary))
-  circle((18.5, 0), radius: 1, fill: primary, stroke: none)
-}),
-[$N$-electron solution],
-[what we'd like to evaluate],
-[what we can quickly evaluate]
+  }),
+  cetz.canvas({
+    import cetz.draw: *
 
-))
+    content((9, 1.5), [$rho^(f_1 arrow.r 0)$])
+    arc((10.75, 0), start: 0deg, stop: 360deg, radius: (1.5, 1), fill: primary, stroke: none)
+    circle((8, 0), radius: 1, fill: none, stroke: (thickness: 2pt, paint: primary))
+    circle((8, 0), radius: 1, fill: none, stroke: (dash: "dashed", thickness: 2pt, paint: white))
+    // content((8, -1.5), [$f_1 = 0$])
+  }),
+  cetz.canvas({
+    import cetz.draw: *
+
+    content((17.25, 1.5), [$rho - |psi^N_1(r)|^2$])
+    circle((16, 0), radius: 1, fill: none, stroke: (dash: "dashed", thickness: 2pt, paint: primary))
+    circle((18.5, 0), radius: 1, fill: primary, stroke: none)
+  }),
+  [2-electron solution],
+  [what we'd like to evaluate],
+  [what we can quickly evaluate]
+
+  ))
+])
 
 #slide[
 #align(center + horizon, 
@@ -263,34 +307,17 @@ cetz.canvas({
 )
 ]
 
-#slide(repeat: 6, self => [
+#slide(repeat: 5, self => [
 
   #let (uncover, only, alternatives, delayedmark, delayedmarkhl) = methods-with-marks(self)
 
-So instead of...
-$
-  E^"KI" [rho, {rho_i}] = &
-  E^"DFT" [rho]
-  \ & +
-  sum_i {
-    - (E^"DFT" [rho] - delayedmark(#2, E^"DFT" [rho^(f_i arrow.r 0)], tag: #<ENm1_hard>, color: primary))
-    + f_i (delayedmark(#2, E^"DFT" [rho^(f_i arrow.r 1)], tag: #<ENp1_hard>, color: primary) - delayedmark(#2, E^"DFT" [rho^(f_i arrow.r 0)], tag: #<ENm1b_hard>, color: primary))
-  }
-$
-
-#pause
-#annot(<ENm1_hard>, pos: bottom)[#align(center, [cannot evaluate \ directly])]
-#annot(<ENp1_hard>, pos: bottom)[#align(center, [cannot evaluate \ directly])]
-#annot(<ENm1b_hard>, pos: bottom)[#align(center, [cannot evaluate \ directly])]
-#pause
-we can instead evaluate...
 $
   E^"KI"_bold(alpha) [rho, {rho_i}] approx & 
   E^"DFT" [rho]
   \ & +
-  sum_i delayedmark(#5, alpha_i, tag: #<alpha>, color: primary) {
-    - (E^"DFT" [rho] - delayedmark(#4, E^"DFT" [rho - rho_i], tag: #<ENm1>, color: primary))
-    + f_i (delayedmark(#4, E^"DFT" [rho - rho_i + n_i], tag: #<ENp1>, color: primary) - delayedmark(#4, E^"DFT" [rho - rho_i], tag: #<ENm1b>, color: primary))
+  sum_i delayedmark(#3, alpha_i, tag: #<alpha>, color: primary) {
+    - (E^"DFT" [rho] - delayedmark(#2, E^"DFT" [rho - rho_i], tag: #<ENm1>, color: primary))
+    + f_i (delayedmark(#2, E^"DFT" [rho - rho_i + n_i], tag: #<ENp1>, color: primary) - delayedmark(#2, E^"DFT" [rho - rho_i], tag: #<ENm1b>, color: primary))
   }
 $
 
@@ -304,74 +331,57 @@ $
 which is easy to evaluate _e.g._
 $ H^"KI"_(i j) = angle.l phi_j|hat(h)^"DFT" + alpha_i hat(v)_i^"KI"|phi_i angle.r #h(2cm) hat(v)^"KI"_i = - E_"Hxc" [rho - n_i] + E_"Hxc" [rho] - integral v_"Hxc" (bold(r)', [rho]) n_i d bold(r)' $
 
+#pause
+Screening parameters _not_ a fitting parameter!
+
 ])
 
-== Screening
-
-#grid(columns: (1fr, 2fr), 
-[
-#align(center + horizon, 
-  image("figures/fig_pwl.png", width: 100%)
-)
-],
-[
-
-#pause
-Construct $alpha_i$ from explicit $Delta$SCF calculations@Nguyen2018@DeGennaro2022a
-
-$
-  alpha_i = alpha_i^0 (Delta E_i - lambda_(i i)(0)) / (lambda_(i i)(alpha^0) - lambda_(i i)(0)) "where" lambda_(i i)(alpha) = angle.l phi_i|hat(h)^"DFT" + alpha hat(v)_i^"KI"|phi_i angle.r $
-
-#pause
-Recast via linear response@Colonna2018:
-
-$
-  alpha_i = (angle.l n_i mid(|) epsilon^(-1) f_"Hxc" mid(|) n_i angle.r) / (angle.l n_i mid(|) f_"Hxc" mid(|) n_i angle.r)
-$
-
-which can be efficiently computed via DFPT@Colonna2022
-],
-)
+// == Screening
+// 
+// #grid(columns: (1fr, 2fr), 
+// [
+// #align(center + horizon, 
+//   image("figures/fig_pwl.png", width: 100%)
+// )
+// ],
+// [
+// 
+// #pause
+// Construct $alpha_i$ from explicit $Delta$SCF calculations@Nguyen2018@DeGennaro2022a
+// 
+// $
+//   alpha_i = alpha_i^0 (Delta E_i - lambda_(i i)(0)) / (lambda_(i i)(alpha^0) - lambda_(i i)(0)) "where" lambda_(i i)(alpha) = angle.l phi_i|hat(h)^"DFT" + alpha hat(v)_i^"KI"|phi_i angle.r $
+// 
+// #pause
+// Recast via linear response@Colonna2018:
+// 
+// $
+//   alpha_i = (angle.l n_i mid(|) epsilon^(-1) f_"Hxc" mid(|) n_i angle.r) / (angle.l n_i mid(|) f_"Hxc" mid(|) n_i angle.r)
+// $
+// 
+// which can be efficiently computed via DFPT@Colonna2022
+// ],
+// )
 
 == Orbital-density dependence
-The potential is orbital-dependent!
+The potential is orbital-density-dependent!
   $ v^"KI"_(i in"occ") = - E_"Hxc" [rho - n_i] + E_"Hxc" [rho] - integral v_"Hxc" (bold(r)', [rho]) n_i d bold(r)' $
 
 #pause
 
 #align(center,
-  grid(columns: 2,
-  image("figures/fig_nguyen_variational_orbital.png", width: 90%),
-  image("figures/fig_nguyen_canonical_orbital.png", width: 90%),
+  grid(columns: (auto, auto), column-gutter: 1em,
+  image("figures/fig_nguyen_variational_orbital.png", width: 10em),
+  image("figures/fig_nguyen_canonical_orbital.png", width: 10em),
   [two variational orbitals],
   [a canonical orbital],
   )
 )
 
-#slide[
-  Because we have an ODD... #pause
+#pause
 - minimisation gives localised orbitals, so we can use MLWFs@Marzari2012 #pause
 - we know $hat(H)|phi_i angle.r$ but not $hat(H)$ #pause
 - we have a natural generalisation of DFT towards spectral functional theory@Ferretti2014
-]
-
-== Issues with extended systems
-
-#align(center + horizon, 
-  image("figures/fig_nguyen_scaling.png", width: 60%)
-)
-
-#pause One cell: $E(N + delta N) - E(N)$ #pause; all cells: $Delta E = 1 / (delta N) (E(N + delta N) - E(N)) = (d E)/ (d N) = - epsilon_(H O)$@Nguyen2018
-
-== Issues with extended systems
-
-#align(center + horizon, 
-  image("figures/fig_nguyen_scaling.png", width: 60%)
-)
-
-Two options: #pause _1._ use a more advanced functional#pause, or _2._ stay in the "safe" region
-#blcite(<Nguyen2018>)
-
 
 == To summarise...
 $
@@ -385,10 +395,9 @@ $
 $
 
 - an orbital-by-orbital correction to DFT
-- localised charge excitations baked into derivatives
-- total energy unchanged!
 - screening parameters
 - orbital-density-dependence
+- total energy unchanged!
 
 == Comparison with DFT+_U_ (and BLOR)
 #slide()[
@@ -411,7 +420,7 @@ $
 #table(align: horizon, columns: (1fr, 2fr, 2fr), stroke: none,
     table.header([], [DFT+_U_], [Koopmans]),
     table.hline(),
-   [designed to correct...],
+   [seeks to correct...],
    [erroneous global curvature in total energies w.r.t. $N$],
    [erroneous global curvature in total energies w.r.t. #uncover("6-")[*canonical*] orbital occupancies],
    [by construction...],
@@ -419,13 +428,13 @@ $
    [removes dependence of $epsilon_i$ on #uncover("7-")[*variational*] orbital occupations and guarantees $epsilon_i = E_i (N plus.minus 1) - E(N)$],
    [correction applied to...],
    uncover("2-")[selected subspaces (e.g. _3d_ orbitals)],
-   uncover("3-")[the entire system],
+   uncover("4-")[the entire system],
    [orbitals defined by...],
-   uncover("4-")[Hubbard projectors (atom-centred, frozen, incomplete)],
+   uncover("3-")[Hubbard projectors (atom-centred, frozen, incomplete)],
    uncover("5-")[variational (localised) orbitals],
    [parametrised by...],
-   uncover("8-")[${U_i}$, defined w.r.t. charge-neutral excitations if using LR],
-   uncover("9-")[${alpha_i}$, defined w.r.t. charged excitations]
+   uncover("8-")[${U_I}$], //, defined w.r.t. charge-neutral excitations if using LR],
+   uncover("9-")[${alpha_i}$], // defined w.r.t. charged excitations]
 
 )
   
@@ -442,7 +451,7 @@ image("figures/colonna_2019_gw100_ip.jpeg", width: 100%)
 
 === UV photoemission spectra@Nguyen2015
 #align(center + horizon,
-image("figures/fig_nguyen_prl_spectra.png", width: 100%)
+image("figures/fig_nguyen_prl_spectra_pink.png", width: 100%)
 )
 
 
@@ -491,7 +500,7 @@ image("figures/ZnO_ki_cropped_noaxis.png", height: 50%),
 #table(columns: (auto, 1fr, 1fr, 1fr, 1fr, 1fr, 1.5fr), align: center, inset: 0.5em, stroke: none,
 table.header([], [LDA ], [HSE ], [GW#sub[0] ], [scGW̃ ], [KI ], [exp ]),
 table.hline(),
-[$E_"gap"$], [0.79], [2.79], [3.0], [3.2], [3.52], [3.52],
+[$E_"gap"$], [0.79], [2.79], [3.0], [3.2], [3.68], [3.60],
 [$angle.l epsilon_d angle.r$], [-5.1], [-6.1], [-6.4], [-6.7], [-6.93], [-7.5 to -8.81 ],
 [$Delta$], [4.15], [], [], [], [4.99], [5.3]
 )
@@ -516,7 +525,7 @@ table.hline(),
 == Resonance with other efforts
 
 - Wannier transition state method of Anisimov and Kozhevnikov@Anisimov2005
-- Optimally-tunded range-separated hybrid functionals of Kronik, Pasquarello, and others@Kronik2012@Wing2021
+- Optimally-tuned range-separated hybrid functionals of Kronik, Pasquarello, and others@Kronik2012@Wing2021
 - Ensemble DFT of Kraisler and Kronik@Kraisler2013
 - Koopmans-Wannier method of Wang and co-workers@Ma2016
 - Dielectric-dependent hybrid functionals of Galli and co-workers@Skone2016a
@@ -601,9 +610,248 @@ $
   - $Delta$SCF@Nguyen2018@DeGennaro2022a: embarrassingly parallel steps which each cost $cal(O)(N_"SC"^3) tilde cal(O)(N_bold(k)^3 N^3)$ #pause
   - DFPT@Colonna2018@Colonna2022: $cal(O)(N_bold(k)^2 N^3)$
 
-#pause ... can we do even better?
+... can we go even faster?
 
-= Machine-learned electronic screening
+== Machine-learned electronic screening
+#slide[
+  #grid(
+    columns: (1fr, 1fr),
+    align: center + horizon,
+    gutter: 1em,
+    image(
+      "figures/convergence_key.png",
+      height: 5%,
+    ) +  v(-1em) +
+    image(
+      "figures/convergence_fig.png",
+      height: 55%,
+    ),
+    image("figures/speedup.png", height: 60%),
+
+    [*accurate* to within $cal("O")$(10 meV) _cf._ typical band gap accuracy of $cal("O")$(100 meV)],
+    [*speedup* of $cal("O")$(10) to $cal("O")$(100)],
+  )
+
+  #blcite(<Schubert2024>)
+]
+
+// == 
+// #image("figures/supercell_workflow.png", width: 100%)
+// 
+// #image("figures/primitive_workflow.png", width: 65.5%)
+
+#focus-slide()[
+#align(center, image(width: 80%, "media/logos/koopmans_white_on_transparent.svg"))
+]
+
+== `koopmans`
+#matrix-slide(alignment: horizon)[
+  #image("figures/website_cropped.png")
+][
+  
+  - automated workflows
+  - `Quantum ESPRESSO` backend
+  - easy installation
+  - python API
+  
+  See `koopmans-functionals.org`
+]
+
+#matrix-slide(alignment: horizon, columns: (3fr, 2fr))[
+  #image("figures/black_box_filled_square.png")
+][
+ 
+  Our goal:
+  + accurate
+  + robust
+  + minimal input
+  + fast
+
+  #pause
+  To this end... #pause
+  - symmetries #pause
+  - automated Wannierisation #pause
+  - `AiiDA` integration
+]
+
+== 
+#slide()[
+#show table.cell: it => {
+  if it.x == 5 {
+    set text(fill: primary, weight: "semibold")
+    it
+  } else {
+    it
+  }
+}
+#grid(columns: 3, align: horizon + center,
+  [
+  #set text(size: 0.45em)
+  #raw(read("scripts/gaas_auto.json"), block: true, lang: "json")
+  ],
+  [
+    #set text(size: 3em)
+    #sym.arrow.r
+  ],
+  [
+    #image("figures/Unfold_And_Interpolate_bandstructure.png", height: 60%)
+    #table(columns: (auto, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr), inset: 0.5em, stroke: none,
+    table.header([], [LDA], [HSE], [GW#sub[0]], [scGW̃ ], [KI], [exp]),
+    table.hline(),
+    [$E_"gap"$], [0.26], [1.28], [1.55], [1.62], [1.54], [1.55],
+    [$angle.l epsilon_d angle.r$], [-14.9], [-15.6], [-17.3], [-17.6], [-17.9], [-18.9],
+    [$Delta$], [12.8], [13.9], [], [], [12.7], [13.1]
+    )
+  ]
+)
+]
+
+= Summary
+== Summary
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 1em,
+  image("figures/black_box_filled_square.png", width: 100%),
+  text[
+    Koopmans functionals...
+    - impose generalised piecewise linearity condition to DFT
+    - give band structures with comparable accuracy to state-of-the-art GW
+    - can be used in place of GW in BSE calculation of excitons, SOC, ...
+    - are increasingly black-box
+  ],
+)
+
+== Open questions
+
+#pause
+- why does correcting _local_ charged excitations correct the description of delocalized excitations? #pause
+- is there a good metric for selecting variational orbitals (_i.e._ the subspace with respect to which we enforce piecewise linearity)? #pause
+- are off-diagonal corrections appropriate? What form should they take? #pause
+- how to extend to metallic systems? #pause
+- can we provide a formal basis for the Koopmans correction? #pause
+  - GKS
+  - spectral functional theory@Ferretti2014
+  - ensemble DFT
+  - RDMFT
+
+== Want to find out more?
+#slide()[
+#show grid.cell: it => {
+  let weight = "regular"
+  if it.y == 1 {
+    weight = "bold"
+  }
+  if it.x < 3 {
+    set text(size: 0.8em, fill: silver.darken(50%), weight: weight)
+    it
+  } else {
+    set text(size: 0.8em, weight: weight)
+    it
+  }
+}
+#let nm_data = read("media/mugshots/nicola_marzari.jpeg", encoding: none)
+#let ms_data = read("media/mugshots/marija_stojkovic.jpg", encoding: none)
+#let nc_data = read("media/mugshots/nicola_colonna.png", encoding: none)
+#align(center + horizon, 
+grid(columns: (1fr, 1fr, 1fr, 1fr, 1.2fr), align: center + top, inset: 0.5em,
+  image-grayscale(nm_data, height: 50%),
+  image-grayscale(ms_data, height: 50%),
+  image-grayscale(nc_data, height: 50%),
+  image("media/mugshots/junfeng_qiao.jpeg", height: 50%),
+  image("media/mugshots/aleksandr_poliukhin.jpg", height: 50%),
+  [Nicola Marzari], [Marija Stojkovic], [Nicola Colonna], [Junfeng Qiao], [Aleksandr Poliukhin],
+  [Monday], [Monday], [Tuesday], [Poster B4.16 today!], [Thu 1000 Room C],
+  [spectral theories], [band alignment for photocatalysis], [non-collinear spin], [automated Wannierisation], [phonons]
+) + [... or go to `koopmans-functionals.org`]
+)
+  
+]
+
+
+== Acknowledgements
+#align(center + horizon, 
+grid(columns: 9, column-gutter: 0.5em, align: center, row-gutter: 0.5em,
+  image("media/mugshots/nicola_colonna.png", height: 40%),
+  image("media/mugshots/miki_bonacci.jpg", height: 40%),
+  image("media/mugshots/aleksandr_poliukhin.jpg", height: 40%),
+  image("media/mugshots/marija_stojkovic.jpg", height: 40%),
+  image("media/mugshots/giovanni_cistaro.jpeg", height: 40%),
+  image("media/mugshots/julian_geiger.jpg", height: 40%),
+  image("media/mugshots/junfeng_qiao.jpeg", height: 40%),
+  image("media/mugshots/yannick_schubert.jpg", height: 40%),
+  image("media/mugshots/nicola_marzari.jpeg", height: 40%),
+  [Nicola Colonna], [Miki Bonacci], [Aleksandr Poliukhin], [Marija Stojkovic], [Giovanni Cistaro], [Julian Geiger], [Junfeng Qiao], [Yannick Schubert], [Nicola Marzari]
+)
+)
+
+#align(
+  center,
+  grid(
+    columns: 2,
+    align: horizon + center,
+    gutter: 2em,
+    image("media/logos/SNF_logo_standard_web_color_pos_e.svg", height: 20%),
+    image("media/logos/marvel_color_on_transparent.png", height: 20%),
+  ),
+)
+
+
+#focus-slide()[#align(center, text(size: 2em, [Thank you!]) + linebreak() + text(size: 0.5em, style: "italic", [these slides are available at #h(0.2em) #box[#move(dy: 0.1em, image("media/logos/github-mark-white.svg", height: 1em))] `elinscott-talks`]))]
+
+
+#show: appendix
+#focus-slide()[#align(center, text(size: 2em, [spare slides]))]
+
+#matrix-slide(columns: (3fr, 2fr))[
+#align(center + horizon,
+  {only("1")[#image("figures/alpha_calc/fig_alpha_calc_step_0.png", height: 80%)]
+  only("2")[#image("figures/alpha_calc/fig_alpha_calc_step_1.png", height: 80%)]
+  only("3")[#image("figures/alpha_calc/fig_alpha_calc_step_2.png", height: 80%)]
+  only("4-5")[#image("figures/alpha_calc/fig_alpha_calc_step_3.png", height: 80%)]
+  only("6-7")[#image("figures/alpha_calc/fig_alpha_calc_step_4.png", height: 80%)]
+  }
+)
+][
+#only("7")[$ alpha_i = alpha_i^0 (Delta E_i - lambda_(i i)(0)) / (lambda_(i i)(alpha^0) - lambda_(i i)(0)) $
+$ lambda_(i i)(alpha) = angle.l phi_i|hat(h)^"DFT" + alpha hat(v)_i^"KI"|phi_i angle.r $]
+]
+
+== Issues with extended systems
+
+#align(center + horizon, 
+  image("figures/fig_nguyen_scaling.png", width: 60%)
+)
+
+Two options: #pause _1._ use a more advanced functional#pause, or _2._ stay in the "safe" region
+#blcite(<Nguyen2018>)
+
+#slide()[
+#set text(size: 0.8em)
+#raw(read("scripts/gaas.json"), block: true, lang: "json")
+]
+
+
+== Automated Wannierisation
+#slide()[
+  Koopmans functionals rely heavily on Wannier functions...
+  - to initialise the minmising orbitals, _or_
+  - in place of the minimising orbitals entirely
+
+#pause
+
+#grid(
+  columns: (2fr, 2fr, 3fr),
+  align: center + horizon,
+  gutter: 1em,
+  image("figures/proj_disentanglement_fig1a.png", height: 45%),
+  image("figures/new_projs.png", height: 45%),
+  image("figures/target_manifolds_fig1b.png", height: 45%),
+
+  text("projectability-based disentanglement") + cite(<Qiao2023>),
+  text("use PAOs found in pseudopotentials"),
+  text("parallel transport to separate manifolds") + cite(<Qiao2023a>),
+)
+]
 == Machine-learned electronic screening
 
 #pagebreak()
@@ -715,78 +963,7 @@ The use-case
   #blcite(<Schubert2024>)
 ]
 
-= How can I run these calculations?
 
-// == 
-// #image("figures/supercell_workflow.png", width: 100%)
-// 
-// #image("figures/primitive_workflow.png", width: 65.5%)
-
-#focus-slide()[
-#align(center, image(width: 80%, "media/logos/koopmans_white_on_transparent.svg"))
-]
-
-== `koopmans`
-#matrix-slide(alignment: horizon)[
-  #image("figures/website_cropped.png")
-][
-  
-  - automated workflows
-  - `Quantum ESPRESSO` backend
-  - easy installation
-  - minimal technical knowledge required
-  - python API
-  
-  See `koopmans-functionals.org`
-]
-
-
-#matrix-slide(alignment: horizon, columns: (2fr, 1fr))[
-  #image("figures/black_box_filled_square.png")
-][
- 
-  Our goal:
-  + accurate
-  + robust
-  + minimal input
-  + fast
-]
-
-#slide()[
-#set text(size: 0.8em)
-#raw(read("scripts/gaas.json"), block: true, lang: "json")
-]
-
-= Towards black-box: automated Wannierisation
-
-== Automated Wannierisation
-#slide()[
-  Koopmans functionals rely heavily on Wannier functions...
-  - to initialise the minmising orbitals, _or_
-  - in place of the minimising orbitals entirely
-
-#pause
-
-#grid(
-  columns: (2fr, 2fr, 3fr),
-  align: center + horizon,
-  gutter: 1em,
-  image("figures/proj_disentanglement_fig1a.png", height: 45%),
-  image("figures/new_projs.png", height: 45%),
-  image("figures/target_manifolds_fig1b.png", height: 45%),
-
-  text("projectability-based disentanglement") + cite(<Qiao2023>),
-  text("use PAOs found in pseudopotentials"),
-  text("parallel transport to separate manifolds") + cite(<Qiao2023a>),
-)
-]
-
-#slide()[
-#set text(size: 0.8em)
-#raw(read("scripts/gaas_auto.json"), block: true, lang: "json")
-]
-
-= Towards black-box: taking advantage of symmetries
 == Taking advantage of symmetries
 To compute screening parameters via DFPT...
 #algorithm(inset: 0.3em, indent: 1em, {
@@ -817,9 +994,7 @@ $bold(k) in "BZ"$ $arrow.r$ $bold(k) in "IBZ"(bold(q))$ (can only use symmetries
 
 #align(horizon + center, image("figures/bz-to-ibz-speedup.svg", height: 100%))
 
-= Towards black-box: `AiiDA` integration
-==
-
+== 
 #blcite(<Huber2020>)
 #v(-2em)
 #align(center,
@@ -833,123 +1008,12 @@ $bold(k) in "BZ"$ $arrow.r$ $bold(k) in "IBZ"(bold(q))$ (can only use symmetries
   ]
 )
 
-remote compute, parallel step execution, outputs stored in a database, provenance-tracking, (requires configuration, WIP...)
+remote compute, parallel step execution, provenance-tracking, (requires configuration, WIP...)
 
 #pause
 #align(center, 
   image("figures/aiida-speed-up.svg", width: 70%)
 )
-
-= Summary
-== Summary
-#grid(
-  columns: (1fr, 2fr),
-  gutter: 1em,
-  image("figures/black_box_filled_square.png", width: 100%),
-  text[
-    Koopmans functionals...
-    - bake localised charged excitation energies into DFT
-    - give band structures with comparable accuracy to state-of-the-art GW
-    - can be used in place of GW in BSE calculation of excitons
-    - are increasingly black-box
-      - `aiida-koopmans` release coming soon!
-  ],
-)
-
-== Open questions
-
-#pause
-- why does correcting _local_ charged excitations correct the description of delocalized excitations? #pause
-- is there a good metric for selecting variational orbitals (_i.e._ the subspace with respect to which we enforce piecewise linearity)? #pause
-- are off-diagonal corrections appropriate? What form should they take? #pause
-- how to extend to metallic systems? #pause
-- can we provide a formal basis for the Koopmans correction? #pause
-  - GKS
-  - spectral functional theory@Ferretti2014
-  - ensemble DFT
-  - RDMFT
-
-== Want to find out more?
-#slide()[
-#show grid.cell: it => {
-  let weight = "regular"
-  if it.y == 1 {
-    weight = "bold"
-  }
-  if it.x < 3 {
-    set text(size: 0.8em, fill: silver.darken(50%), weight: weight)
-    it
-  } else {
-    set text(size: 0.8em, weight: weight)
-    it
-  }
-}
-#let nm_data = read("media/mugshots/nicola_marzari.jpeg", encoding: none)
-#let ms_data = read("media/mugshots/marija_stojkovic.jpg", encoding: none)
-#let nc_data = read("media/mugshots/nicola_colonna.png", encoding: none)
-#align(center + horizon, 
-grid(columns: (1fr, 1fr, 1fr, 1fr, 1.2fr), align: center + top, inset: 0.5em,
-  image-grayscale(nm_data, height: 50%),
-  image-grayscale(ms_data, height: 50%),
-  image-grayscale(nc_data, height: 50%),
-  image("media/mugshots/junfeng_qiao.jpeg", height: 50%),
-  image("media/mugshots/aleksandr_poliukhin.jpg", height: 50%),
-  [Nicola Marzari], [Marija Stojkovic], [Nicola Colonna], [Junfeng Qiao], [Aleksandr Poliukhin],
-  [Monday], [Monday], [Tuesday], [Poster B4.16 today!], [Thu 1000 Room C],
-  [spectral theories], [band alignment for photocatalysis], [non-collinear spin], [automated Wannierisation], [phonons]
-) + [... or go to `koopmans-functionals.org`]
-)
-  
-]
-
-
-== Acknowledgements
-#align(center + horizon, 
-grid(columns: 9, column-gutter: 0.5em, align: center, row-gutter: 0.5em,
-  image("media/mugshots/nicola_colonna.png", height: 40%),
-  image("media/mugshots/miki_bonacci.jpg", height: 40%),
-  image("media/mugshots/aleksandr_poliukhin.jpg", height: 40%),
-  image("media/mugshots/marija_stojkovic.jpg", height: 40%),
-  image("media/mugshots/giovanni_cistaro.jpeg", height: 40%),
-  image("media/mugshots/julian_geiger.jpg", height: 40%),
-  image("media/mugshots/junfeng_qiao.jpeg", height: 40%),
-  image("media/mugshots/yannick_schubert.jpg", height: 40%),
-  image("media/mugshots/nicola_marzari.jpeg", height: 40%),
-  [Nicola Colonna], [Miki Bonacci], [Aleksandr Poliukhin], [Marija Stojkovic], [Giovanni Cistaro], [Julian Geiger], [Junfeng Qiao], [Yannick Schubert], [Nicola Marzari]
-)
-)
-
-#align(
-  center,
-  grid(
-    columns: 2,
-    align: horizon + center,
-    gutter: 2em,
-    image("media/logos/SNF_logo_standard_web_color_pos_e.svg", height: 20%),
-    image("media/logos/marvel_color_on_transparent.png", height: 20%),
-  ),
-)
-
-
-#focus-slide()[#align(center, text(size: 2em, [Thank you!]) + linebreak() + text(size: 0.5em, style: "italic", [these slides are available at #h(0.2em) #box[#move(dy: 0.1em, image("media/logos/github-mark-white.svg", height: 1em))] `elinscott-talks`]))]
-
-
-#show: appendix
-#focus-slide()[#align(center, text(size: 2em, [spare slides]))]
-
-#matrix-slide(columns: (3fr, 2fr))[
-#align(center + horizon,
-  {only("1")[#image("figures/alpha_calc/fig_alpha_calc_step_0.png", height: 80%)]
-  only("2")[#image("figures/alpha_calc/fig_alpha_calc_step_1.png", height: 80%)]
-  only("3")[#image("figures/alpha_calc/fig_alpha_calc_step_2.png", height: 80%)]
-  only("4-5")[#image("figures/alpha_calc/fig_alpha_calc_step_3.png", height: 80%)]
-  only("6-7")[#image("figures/alpha_calc/fig_alpha_calc_step_4.png", height: 80%)]
-  }
-)
-][
-#only("7")[$ alpha_i = alpha_i^0 (Delta E_i - lambda_(i i)(0)) / (lambda_(i i)(alpha^0) - lambda_(i i)(0)) $
-$ lambda_(i i)(alpha) = angle.l phi_i|hat(h)^"DFT" + alpha hat(v)_i^"KI"|phi_i angle.r $]
-]
 
 == Connections with approx. self-energies
 
