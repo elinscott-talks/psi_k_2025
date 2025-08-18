@@ -101,14 +101,14 @@ cetz.canvas({
   image("figures/arpes_puppin.png", height: 45%),
 ))
 
-#blcite(<Torre2021>)#blcite(<Puppin2020>)
+#blcite(<delaTorre2021>)#blcite(<Puppin2020>)
 
 #pause ... but how can we routinely compute them? #pause
 - GW: accurate, expensive, often ill-behaved, diagrammatic
-- DFT: plagued by systematic errors
+- DFT: plagued by intrinsic errors
 #pause
 
-#box[#move(dy: 0.1em, image("figures/lightbulb.png", height: 1em))] Koopmans functionals: cure systematic errors in DFT $arrow.r$ a functional that can accurately predict single-particle excitations
+#box[#move(dy: 0.1em, image("figures/lightbulb.png", height: 1em))] Koopmans functionals: overcome limitations of DFT $arrow.r$ a functional that can accurately predict single-particle excitations
 #v(-1em)
 
 = The failures of DFT
@@ -200,7 +200,7 @@ $
    uncover("2-")[erroneous curvature in total energies w.r.t. $N$],
    uncover("4-")[erroneous curvature in total energies w.r.t. $f_i forall i$],
    [in practice...],
-   uncover("3-")[corrects curvature in total energies w.r.t. local populations (BLOR does so more faithfully)],
+   uncover("3-")[corrects curvature in total energies w.r.t. local manifold (BLOR does so more faithfully)],
    uncover("5-")[removes dependence of $epsilon_i$ on $f_i$ and guarantees $epsilon_i = E_i (N plus.minus 1) - E(N)$],
    [correction applied to...],
    [],
@@ -213,7 +213,7 @@ $
    [],
 )
 ]
-== Making the functional tractable
+== Electronic screening via parameters
 #slide(repeat: 4, self => [
 
   #let (uncover, only, alternatives, delayedmark, delayedmarkhl) = methods-with-marks(self)
@@ -248,9 +248,8 @@ $
   #annot(<ENm1b_hard>, pos: bottom)[#align(center, [cannot evaluate \ directly])]
   #pause
 
-  // 
   // Instead use a frozen-orbital picture:
-  // 
+  
   // $
   //  rho^(f_i arrow.r f)(bold(r)) approx rho(bold(r)) + (f - f_i) |phi^N_i (bold(r))|^2
   // $
@@ -260,37 +259,6 @@ $
   // $
   //   E[rho^(f_i arrow.r f)] approx alpha_i E[rho + (f - f_i) |phi^N_i (bold(r))|^2]
   // $
-  #v(-5em)
-  #align(center + horizon, 
-  grid(align: center + horizon, columns: 3, column-gutter: 2cm, row-gutter: 1cm,
-  cetz.canvas({
-    import cetz.draw: *
-    content((1.25, 1.5), [$rho$])
-    circle((0, 0), radius: 1, fill: primary, stroke: none)
-    circle((2.5, 0), radius: 1, fill: primary, stroke: none)
-
-  }),
-  cetz.canvas({
-    import cetz.draw: *
-
-    content((9, 1.5), [$rho^(f_1 arrow.r 0)$])
-    arc((10.75, 0), start: 0deg, stop: 360deg, radius: (1.5, 1), fill: primary, stroke: none)
-    circle((8, 0), radius: 1, fill: none, stroke: (thickness: 2pt, paint: primary))
-    circle((8, 0), radius: 1, fill: none, stroke: (dash: "dashed", thickness: 2pt, paint: white))
-    // content((8, -1.5), [$f_1 = 0$])
-  }),
-  cetz.canvas({
-    import cetz.draw: *
-
-    content((17.25, 1.5), [$rho - |psi^N_1(r)|^2$])
-    circle((16, 0), radius: 1, fill: none, stroke: (dash: "dashed", thickness: 2pt, paint: primary))
-    circle((18.5, 0), radius: 1, fill: primary, stroke: none)
-  }),
-  [2-electron solution],
-  [what we'd like to evaluate],
-  [what we can quickly evaluate]
-
-  ))
 ])
 
 #slide[
@@ -366,11 +334,15 @@ Screening parameters _not_ a fitting parameter!
 // )
 
 == Orbital-density dependence
+#slide()[
 The potential is orbital-density-dependent!
+#v(-0.5em)
   $ v^"KI"_(i in"occ") = - E_"Hxc" [rho - n_i] + E_"Hxc" [rho] - integral v_"Hxc" (bold(r)', [rho]) n_i d bold(r)' $
 
 #pause
 
+- loss of unitary invariance@Nguyen2018
+#v(-1em)
 #align(center,
   grid(columns: (auto, auto), column-gutter: 1em,
   image("figures/fig_nguyen_variational_orbital.png", width: 10em),
@@ -378,14 +350,11 @@ The potential is orbital-density-dependent!
   [two variational orbitals],
   [a canonical orbital],
   )
-)
-
-#pause
-- minimisation gives localised orbitals, so we can use MLWFs@Marzari2012 #pause
+) #pause
+- we can use MLWFs@Marzari2012 #pause
 - we know $hat(H)|phi_i angle.r$ but not $hat(H)$ #pause
-- we have a natural generalisation of DFT towards spectral functional theory@Ferretti2014
-
-#blcite(<Nguyen2018>)
+- a natural generalisation of DFT towards spectral functional theory@Ferretti2014
+]
 
 == To summarise...
 $
@@ -401,7 +370,7 @@ $
 - an orbital-by-orbital correction to DFT
 - screening parameters
 - orbital-density-dependence
-- total energy unchanged!
+- total energy at integer occupations unchanged!
 
 == Comparison with DFT+_U_ (and BLOR)
 #slide()[
@@ -428,7 +397,7 @@ $
    [erroneous global curvature in total energies w.r.t. $N$],
    [erroneous global curvature in total energies w.r.t. #uncover("6-")[*canonical*] orbital occupancies],
    [in practice...],
-   [corrects curvature in total energies w.r.t. local populations (BLOR does so more faithfully)],
+   [corrects curvature in total energies w.r.t. local manifold (BLOR does so more faithfully)],
    [removes dependence of $epsilon_i$ on #uncover("7-")[*variational*] orbital occupations and guarantees $epsilon_i = E_i (N plus.minus 1) - E(N)$],
    [correction applied to...],
    uncover("2-")[selected subspaces (e.g. _3d_ orbitals)],
@@ -597,8 +566,9 @@ table.hline(),
 [G#sub[0]W#sub[0]+BSE], [1.17], [3.25], [3.34], [0.09],
 )
 
-= Scaling
-== Scaling
+= Computational cost and scaling
+== Computational cost and scaling
+
 
 The vast majority of the computational cost: determining screening parameters
 
@@ -614,7 +584,10 @@ $
   - $Delta$SCF@Nguyen2018@DeGennaro2022a: embarrassingly parallel steps which each cost $cal(O)(N_"SC"^3) tilde cal(O)(N_bold(k)^3 N^3)$ #pause
   - DFPT@Colonna2018@Colonna2022: $cal(O)(N_bold(k)^2 N^3)$
 
-... can we go even faster?
+#pagebreak()
+#align(center + horizon,
+image("figures/timings/benchmark.svg", width: 80%)
+)
 
 == Machine-learned electronic screening
 #slide[
@@ -661,6 +634,11 @@ $
   See `koopmans-functionals.org`
 ]
 
+==
+#align(center + horizon,
+image("figures/supercell_workflow.png", width: 100%)
+)
+
 #matrix-slide(alignment: horizon, columns: (3fr, 2fr))[
   #image("figures/black_box_filled_square.png")
 ][
@@ -705,7 +683,7 @@ $
     image("figures/handshake.png", height: 2em, alt: "handshake"),
     image("media/logos/aiida.svg", height: 3em)
   )
-  `$ koopmans run tio2.json` #pause $arrow.r$ `$ koopmans run --engine=aiida tio2.json`
+  #pause `$ koopmans run tio2.json` #pause $arrow.r$ `$ koopmans run --engine=aiida tio2.json`
   ]
 )
 
@@ -803,7 +781,7 @@ grid(columns: (1fr, 1fr, 1fr, 1fr, 1.2fr), align: center + top, inset: 0.5em,
   image("media/mugshots/aleksandr_poliukhin.jpg", height: 50%),
   [Nicola Marzari], [Marija Stojkovic], [Nicola Colonna], [Junfeng Qiao], [Aleksandr Poliukhin],
   [Monday], [Monday], [Tuesday], [Poster B4.16 today!], [Thu 1000 Room C],
-  [spectral theories], [band alignment for photocatalysis], [non-collinear spin], [automated Wannierisation], [phonons]
+  [spectral theories], [band alignment for photocatalysis], [non-collinear spin], [automated Wannierisation], [electron-phonon]
 ) + [... or go to `koopmans-functionals.org`]
 )
   
@@ -842,7 +820,42 @@ grid(columns: 9, column-gutter: 0.5em, align: center, row-gutter: 0.5em,
 
 
 #show: appendix
+
 #focus-slide()[#align(center, text(size: 2em, [spare slides]))]
+
+== Frozen orbital approximation
+
+  #v(-5em)
+  #align(center + horizon, 
+  grid(align: center + horizon, columns: 3, column-gutter: 2cm, row-gutter: 1cm,
+  cetz.canvas({
+    import cetz.draw: *
+    content((1.25, 1.5), [$rho$])
+    circle((0, 0), radius: 1, fill: primary, stroke: none)
+    circle((2.5, 0), radius: 1, fill: primary, stroke: none)
+
+  }),
+  cetz.canvas({
+    import cetz.draw: *
+
+    content((9, 1.5), [$rho^(f_1 arrow.r 0)$])
+    arc((10.75, 0), start: 0deg, stop: 360deg, radius: (1.5, 1), fill: primary, stroke: none)
+    circle((8, 0), radius: 1, fill: none, stroke: (thickness: 2pt, paint: primary))
+    circle((8, 0), radius: 1, fill: none, stroke: (dash: "dashed", thickness: 2pt, paint: white))
+    // content((8, -1.5), [$f_1 = 0$])
+  }),
+  cetz.canvas({
+    import cetz.draw: *
+
+    content((17.25, 1.5), [$rho - |psi^N_1(r)|^2$])
+    circle((16, 0), radius: 1, fill: none, stroke: (dash: "dashed", thickness: 2pt, paint: primary))
+    circle((18.5, 0), radius: 1, fill: primary, stroke: none)
+  }),
+  [2-electron solution],
+  [what we'd like to evaluate],
+  [what we can quickly evaluate]
+
+  ))
 
 #matrix-slide(columns: (3fr, 2fr))[
 #align(center + horizon,
