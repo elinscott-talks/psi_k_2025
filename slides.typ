@@ -97,12 +97,12 @@ cetz.canvas({
   }
   photon(amplitude: 0.8, phases: 9, start-x: -0.25, start-y: 0.25, scale: 3, fill: none, angle: 2.5, mark: (start: ">", fill: black))
 }),
-  image("figures/arpes.png", height: 45%),
-  image("figures/arpes_puppin.png", height: 45%),
+  image("figures/arpes.png", height: 40%),
+  image("figures/arpes_puppin.png", height: 40%),
 ))
 
 #blcite(<delaTorre2021>)#blcite(<Puppin2020>)
-
+#v(-2.5em)
 #pause ... but how can we routinely compute them? #pause
 - GW: accurate, expensive, often ill-behaved, diagrammatic
 - DFT: plagued by intrinsic errors
@@ -214,7 +214,7 @@ $
 )
 ]
 == Electronic screening via parameters
-#slide(repeat: 4, self => [
+#slide(repeat: 3, self => [
 
   #let (uncover, only, alternatives, delayedmark, delayedmarkhl) = methods-with-marks(self)
   $
@@ -880,6 +880,7 @@ $ lambda_(i i)(alpha) = angle.l phi_i|hat(h)^"DFT" + alpha hat(v)_i^"KI"|phi_i a
 Two options: #pause _1._ use a more advanced functional#pause, or _2._ stay in the "safe" region
 #blcite(<Nguyen2018>)
 
+== 
 #slide()[
 #set text(size: 0.8em)
 #raw(read("scripts/gaas.json"), block: true, lang: "json")
