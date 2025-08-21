@@ -568,7 +568,11 @@ table.hline(),
 
 = Computational cost and scaling
 == Computational cost and scaling
+#align(center + horizon,
+image("figures/timings/benchmark.svg", width: 80%)
+)
 
+#pagebreak()
 
 The vast majority of the computational cost: determining screening parameters
 
@@ -579,15 +583,10 @@ $
 #pause
 
 - a local measure of screening of electronic interactions #pause
-- one screening parameter per orbital #pause
+- one screening parameter per orbital
 - must be computed #emph[ab initio] via... #pause
   - $Delta$SCF@Nguyen2018@DeGennaro2022a: embarrassingly parallel steps which each cost $cal(O)(N_"SC"^3) tilde cal(O)(N_bold(k)^3 N^3)$ #pause
   - DFPT@Colonna2018@Colonna2022: $cal(O)(N_bold(k)^2 N^3)$
-
-#pagebreak()
-#align(center + horizon,
-image("figures/timings/benchmark.svg", width: 80%)
-)
 
 == Machine-learned electronic screening
 #slide[
